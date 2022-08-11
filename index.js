@@ -13,9 +13,13 @@ app.post('/api', upload.single('image'), async (req, res) => {
   if (!req.file) res.status(400).send('Missing image multipart/form-data')
   else {
     const image = await tf.node.decodeImage(req.file.buffer)
-    const predictions = await _model.classify(image)
+    const predik = await _model.classify(image)
     image.dispose()
-    res.json(predictions)
+    const result = {}
+	  for(let i of predik){
+        result[i.className.toLowerCase()] = Math.ceil(i.probability * 100)
+    }
+    res.json(result)
   }
 })
 
